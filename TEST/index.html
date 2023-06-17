@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Emotion Recognition</title>
+</head>
+<body>
+  <h1>Emotion Recognition</h1>
+  
+  <input type="file" accept="audio/mp3" id="audioInput">
+  <button onclick="processAudio()">Process Audio</button>
+
+  <div id="output"></div>
+
+  <script>
+    async function processAudio() {
+      const audioInput = document.getElementById('audioInput');
+      const file = audioInput.files[0];
+
+      if (file) {
+        const formData = new FormData();
+        formData.append('audio', file);
+
+        try {
+          const response = await fetch('/process-audio', {
+            method: 'POST',
+            body: formData
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+
+            const naturalness = result.naturalness;
+            const emotion = result.emotion;
+
+            const output = document.getElementById('output');
+            output.innerHTML = `
+              <p>The provided audio's naturalness output is: ${naturalness}</p>
+              <p>Predicted emotion: ${emotion}</p>
+              <p>The naturalness of the provided audio is ${naturalness}, and the predicted emotion is ${emotion}.</p>
+            `;
+          } else {
+            throw new Error('Error processing audio');
+          }
+        } catch (error) {
+          console.error(error);
+          const output = document.getElementById('output');
+          output.innerHTML = '<p>Error processing audio. Please try again.</p>';
+        }
+      }
+    }
+  </script>
+</body>
+</html>
